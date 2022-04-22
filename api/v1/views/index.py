@@ -24,4 +24,4 @@ def stats():
     for cls in classes:
         stats.update({st[classes.index(cls)]: storage.count(cls)})
 
-    return stats
+    return jsonify(stats)
