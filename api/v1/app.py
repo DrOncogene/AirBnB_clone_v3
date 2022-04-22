@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 """ the api flask app"""
 from os import getenv, environ
-from flask import Flask
+from flask import Flask, make_response, jsonify
+from werkzeug.exceptions import *
 from models import storage
 from api.v1.views import app_views
 
@@ -13,6 +14,11 @@ app.register_blueprint(app_views)
 @app.teardown_appcontext
 def close_session(exception):
     storage.close()
+
+
+@app.errorhandler(NotFound)
+def not_found(e):
+    return make_response(jsonify({"error": "Not found"}), 404)
 
 
 if __name__ == "__main__":
