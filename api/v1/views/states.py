@@ -60,6 +60,6 @@ def update_state(state_id):
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'created_at', 'updated_at']:
-            state.__dict__.update({k: v})
+            state.__dict__[k] = v
     storage.save()
     return make_response(jsonify(state.to_dict()), 200)
