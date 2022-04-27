@@ -53,8 +53,7 @@ def create_city(state_id):
     if not state:
         abort(404)
     city = City(state_id=state_id, name=data['name'])
-    storage.new(city)
-    storage.save()
+    city.save()
     return make_response(jsonify(city.to_dict()), 201)
 
 
@@ -72,5 +71,5 @@ def update_city(city_id):
     for k, v in data.items():
         if k not in ['id', 'created_at', 'updated_at']:
             city.__dict__[k] = v
-    storage.save()
+    city.save()
     return make_response(jsonify(city.to_dict()), 200)

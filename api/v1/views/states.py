@@ -42,8 +42,7 @@ def create_state():
     if 'name' not in data:
         return make_response('Missing name', 400)
     state = State(name=data['name'])
-    storage.new(state)
-    storage.save()
+    state.save()
     return make_response(jsonify(state.to_dict()), 201)
 
 
@@ -61,5 +60,5 @@ def update_state(state_id):
     for k, v in data.items():
         if k not in ['id', 'created_at', 'updated_at']:
             state.__dict__[k] = v
-    storage.save()
+    state.save()
     return make_response(jsonify(state.to_dict()), 200)
