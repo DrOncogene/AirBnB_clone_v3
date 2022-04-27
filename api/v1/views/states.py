@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ handles the part of the api that deals with state objects"""
 from flask import jsonify, abort, request, make_response
+import json
 from api.v1.views import app_views
 from models import storage
 from models.state import State
@@ -32,8 +33,11 @@ def delete_state(state_id):
 
 @app_views.route('/states', methods=['POST'])
 def create_state():
-    data = request.json
-    if not data:
+    try:
+        data = request.get_json()
+        if not data:
+            return make_response('Not a JSON', 400)
+    except Exception:
         return make_response('Not a JSON', 400)
     if 'name' not in data:
         return make_response('Missing name', 400)
@@ -42,13 +46,17 @@ def create_state():
     storage.save()
     return make_response(jsonify(state.to_dict()), 201)
 
+
 @app_views.route('/states/<state_id>', methods=['PUT'])
 def update_state(state_id):
     state = storage.get(State, state_id)
     if not state:
         abort(404)
-    data = request.json
-    if not data:
+    try:
+        data = request.get_json()
+        if not data:
+            return make_response('Not a JSON', 400)
+    except Exception:
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         state.__dict__.update({k: v})
