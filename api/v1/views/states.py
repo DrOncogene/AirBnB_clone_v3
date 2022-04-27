@@ -28,7 +28,7 @@ def delete_state(state_id):
         abort(404)
     storage.delete(state)
     storage.save()
-    return jsonify("{}")
+    return jsonify({})
 
 
 @app_views.route('/states', methods=['POST'])
@@ -59,7 +59,8 @@ def update_state(state_id):
     except Exception:
         return make_response('Not a JSON\n', 400)
     for k, v in data.items():
-        state.__dict__.update({k: v})
+        if k not in ['id', 'created_at', 'updated_at']:
+            state.__dict__.update({k: v})
     storage.new(state)
     storage.save()
     return make_response(jsonify(state.to_dict()), 200)
