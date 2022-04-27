@@ -7,7 +7,7 @@ from models import storage
 from models.state import State
 
 
-@app_views.route('/states')
+@app_views.route('/states/', strict_slashes=False)
 def states():
     all_states = [state.to_dict() for state in storage.all(State).values()]
     return jsonify(all_states)
@@ -31,14 +31,14 @@ def delete_state(state_id):
     return jsonify({})
 
 
-@app_views.route('/states', methods=['POST'])
+@app_views.route('/states/', methods=['POST'], strict_slashes=False)
 def create_state():
     try:
         data = request.get_json()
         if not data:
-            return make_response('Not a JSON\n', 400)
+            return make_response('Not a JSON', 400)
     except Exception:
-        return make_response('Not a JSON\n', 400)
+        return make_response('Not a JSON', 400)
     if 'name' not in data:
         return make_response('Missing name', 400)
     state = State(name=data['name'])
@@ -55,9 +55,9 @@ def update_state(state_id):
     try:
         data = request.get_json()
         if not data:
-            return make_response('Not a JSON\n', 400)
+            return make_response('Not a JSON', 400)
     except Exception:
-        return make_response('Not a JSON\n', 400)
+        return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'created_at', 'updated_at']:
             state.__dict__.update({k: v})
