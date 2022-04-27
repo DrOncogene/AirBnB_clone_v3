@@ -36,9 +36,9 @@ def create_state():
     try:
         data = request.get_json()
         if not data:
-            return make_response('Not a JSON', 400)
+            return make_response('Not a JSON\n', 400)
     except Exception:
-        return make_response('Not a JSON', 400)
+        return make_response('Not a JSON\n', 400)
     if 'name' not in data:
         return make_response('Missing name', 400)
     state = State(name=data['name'])
@@ -55,9 +55,9 @@ def update_state(state_id):
     try:
         data = request.get_json()
         if not data:
-            return make_response('Not a JSON', 400)
+            return make_response('Not a JSON\n', 400)
     except Exception:
-        return make_response('Not a JSON', 400)
+        return make_response('Not a JSON\n', 400)
     for k, v in data.items():
         state.__dict__.update({k: v})
     storage.new(state)
