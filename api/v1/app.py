@@ -2,6 +2,7 @@
 """ the api flask app"""
 from os import getenv, environ
 from flask import Flask, make_response, jsonify
+from flask_cors import CORS
 from werkzeug.exceptions import *
 from models import storage
 from api.v1.views import app_views
@@ -10,6 +11,7 @@ from api.v1.views import app_views
 app = Flask(__name__)
 app.register_blueprint(app_views)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+cors = CORS(app=app, resorces='/*', origins='0.0.0.0')
 
 
 @app.teardown_appcontext
