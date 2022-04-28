@@ -44,7 +44,7 @@ def create_user():
         return make_response('Missing email', 400)
     if 'password' not in data:
         return make_response('Missing password', 400)
-    user = User(name=data['name'], password=data['password'])
+    user = User(email=data['email'], password=data['password'])
     user.save()
     return make_response(jsonify(user.to_dict()), 201)
 
