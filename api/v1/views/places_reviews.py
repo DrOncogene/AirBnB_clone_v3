@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" handles the part of the api that deals with place objects"""
+""" handles the part of the api that deals with review objects"""
 from flask import jsonify, abort, request, make_response
 import json
 from api.v1.views import app_views
