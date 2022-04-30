@@ -45,7 +45,7 @@ def delete_place_amenity(place_id, amenity_id):
         abort(404) if amenity.id not in place.amenity_ids\
          else place.amenity_ids.pop(amenity.id)
     storage.save()
-    return jsonify({})
+    return make_response(jsonify({}), 200)
 
 
 @app_views.route('/places/<place_id>/amenities/<amenity_id>',
