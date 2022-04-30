@@ -55,6 +55,8 @@ class BaseModel:
     def save(self):
         """updates the attribute 'updated_at' with the current datetime"""
         self.updated_at = datetime.utcnow()
+        if self.__class__.__name__ == 'User':
+            self.hash_password()
         models.storage.new(self)
         models.storage.save()
 
