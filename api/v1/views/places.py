@@ -78,3 +78,25 @@ def update_place(place_id):
             place.__dict__[k] = v
     place.save()
     return make_response(jsonify(place.to_dict()), 200)
+
+
+@app_views.route('/places_search', methods=['POST'])
+def place_search():
+    try:
+        data = request.get_json()
+    except Exception:
+        return make_response('Not a JSON', 400)
+
+    all_places = storage.all(Place)
+    match = set()
+    states = data.get('states') if data else []
+    cities = data.get('cities') if data else []
+    amenities = data.get('amenities') if data else []
+    all_empty = not len(states) and not len(cities) and not len(amenities)
+    if not data or all_empty:
+        match = [place.to_dict() for place in all_places.values()]
+        return jsonify(match)
+    states = data['states']
+    for state_id in states:
+        pass
+    
