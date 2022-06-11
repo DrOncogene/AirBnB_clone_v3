@@ -71,7 +71,7 @@ def update_place(place_id):
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
-            place.__dict__[k] = v
+            setattr(place, k, v)
     place.save()
     return make_response(jsonify(place.to_dict()), 200)
 
@@ -88,9 +88,8 @@ def place_search():
     cities = data.get('cities') if data else []
     amenities = data.get('amenities') if data else []
     all_empty = not states and not cities and not amenities
-    if not data or all_empty:
+    if all_empty:
         match = {place.to_dict() for place in all_places.values()}
-        return jsonify(list(match))
     states = data['states']
     for state_id in states:
         state = storage.get(State, state_id)
