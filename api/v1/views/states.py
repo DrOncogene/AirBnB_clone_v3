@@ -33,11 +33,9 @@ def delete_state(state_id):
 
 @app_views.route('/states/', methods=['POST'], strict_slashes=False)
 def create_state():
-    try:
+    if request.is_json:
         data = request.get_json()
-        if not data:
-            return make_response('Not a JSON', 400)
-    except Exception:
+    else:
         return make_response('Not a JSON', 400)
     if 'name' not in data:
         return make_response('Missing name', 400)
@@ -51,11 +49,9 @@ def update_state(state_id):
     state = storage.get(State, state_id)
     if not state:
         abort(404)
-    try:
+    if request.is_json:
         data = request.get_json()
-        if not data:
-            return make_response('Not a JSON', 400)
-    except Exception:
+    else:
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'created_at', 'updated_at']:

@@ -45,11 +45,9 @@ def create_review(place_id):
     place = storage.get(Place, place_id)
     if not place:
         abort(404)
-    try:
+    if request.is_json:
         data = request.get_json()
-        if not data:
-            return make_response('Not a JSON', 400)
-    except Exception:
+    else:
         return make_response('Not a JSON', 400)
     if 'user_id' not in data:
         return make_response('Missing user_id', 400)
