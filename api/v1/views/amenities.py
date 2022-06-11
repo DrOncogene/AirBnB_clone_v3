@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """ handles the part of the api that deals with amenity objects"""
 from flask import jsonify, abort, request, make_response
-import json
 from api.v1.views import app_views
 from models import storage
 from models.amenity import Amenity
@@ -34,9 +33,8 @@ def delete_amenity(amenity_id):
 
 @app_views.route('/amenities/', methods=['POST'], strict_slashes=False)
 def create_amenity():
-    if request.is_json:
-        data = request.get_json()
-    else:
+    data = request.get_json(silent=True)
+    if not data:
         return make_response('Not a JSON', 400)
     if 'name' not in data:
         return make_response('Missing name', 400)
@@ -50,9 +48,8 @@ def update_amenity(amenity_id):
     amenity = storage.get(Amenity, amenity_id)
     if not amenity:
         abort(404)
-    if request.is_json:
-        data = request.get_json()
-    else:
+    data = request.get_json(silent=True)
+    if not data:
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'created_at', 'updated_at']:

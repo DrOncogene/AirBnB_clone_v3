@@ -1,8 +1,5 @@
 #!/usr/bin/python3
 """ handles the part of the api that deals with city objects"""
-import json
-import math
-from re import A
 
 from api.v1.views import app_views
 from flask import abort, jsonify, make_response, request
@@ -49,9 +46,8 @@ def create_place(city_id):
     city = storage.get(City, city_id)
     if not city:
         abort(404)
-    if request.is_json:
-        data = request.get_json()
-    else:
+    data = request.get_json(silent=True)
+    if not data:
         return make_response('Not a JSON', 400)
     if 'user_id' not in data:
         return make_response('Missing user_id', 400)
@@ -70,9 +66,8 @@ def update_place(place_id):
     place = storage.get(Place, place_id)
     if not place:
         abort(404)
-    if request.is_json:
-        data = request.get_json()
-    else:
+    data = request.get_json(silent=True)
+    if not data:
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
@@ -83,9 +78,8 @@ def update_place(place_id):
 
 @app_views.route('/places_search', methods=['POST'])
 def place_search():
-    if request.is_json:
-        data = request.get_json()
-    else:
+    data = request.get_json(silent=True)
+    if not data:
         return make_response('Not a JSON', 400)
 
     all_places = storage.all(Place)

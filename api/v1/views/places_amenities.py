@@ -1,16 +1,10 @@
 #!/usr/bin/python3
 """ handles the part of the api that deals with place_amenity objects"""
-from os import getenv
-from flask import jsonify, abort, request, make_response
-import json
+from flask import jsonify, abort, make_response
 from api.v1.views import app_views
-from models import storage
+from models import storage, storage_t
 from models.amenity import Amenity
 from models.place import Place
-from models.user import User
-
-
-storage_t = getenv('HBNB_TYPE_STORAGE')
 
 
 @app_views.route('/places/<place_id>/amenities/', methods=['GET'],
@@ -20,12 +14,8 @@ def get_place_amenities(place_id):
     if not place:
         abort(404)
     place_amenities = []
-    if storage_t == 'db':
-        for amenity in place.amenities:
-            place_amenities.append(amenity.to_dict())
-    else:
-        for id in place.amenity_ids:
-            place_amenities.append(storage.get(Amenity, id).to_dict())
+    for amenity in place.amenities:
+        place_amenities.append(amenity.to_dict())
     return jsonify(place_amenities)
 
 
@@ -62,6 +52,6 @@ def link_place_amenity(place_id, amenity_id):
     if storage_t == 'db':
         place.amenities.append(amenity)
     else:
-        place.append(amenity)
-    storage.save()
+        place.amenity_ids.append(amenity.id)
+    place.save()
     return make_response(jsonify(amenity.to_dict()), 201)
