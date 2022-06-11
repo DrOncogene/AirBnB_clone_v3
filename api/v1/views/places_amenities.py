@@ -30,10 +30,10 @@ def delete_place_amenity(place_id, amenity_id):
         abort(404)
     if storage_t == 'db':
         abort(404) if amenity not in place.amenities\
-         else place.amenities.pop(amenity)
+         else place.amenities.remove(amenity)
     else:
         abort(404) if amenity.id not in place.amenity_ids\
-         else place.amenity_ids.pop(amenity.id)
+         else place.amenity_ids.remove(amenity.id)
     place.save()
     return jsonify({})
 
