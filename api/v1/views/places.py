@@ -79,7 +79,7 @@ def update_place(place_id):
 @app_views.route('/places_search', methods=['POST'])
 def place_search():
     data = request.get_json(silent=True)
-    if not data:
+    if type(data) is not dict:
         return make_response('Not a JSON', 400)
 
     all_places = storage.all(Place)
@@ -102,6 +102,8 @@ def place_search():
         match = match.union(places_in_city)
 
     if amenities:
+        if len(match) == 0:
+            match = set(all_places.values())
         amenities = {storage.get(Amenity, amenity_id)
                      for amenity_id in amenities}
         match = {place for place in match
