@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """ handles the part of the api that deals with user objects"""
 from flask import jsonify, abort, request, make_response
-import json
 from api.v1.views import app_views
 from models import storage
 from models.user import User
@@ -56,6 +55,6 @@ def update_user(user_id):
         return make_response('Not a JSON', 400)
     for k, v in data.items():
         if k not in ['id', 'email', 'created_at', 'updated_at']:
-            user.__dict__[k] = v
+            setattr(user, k, v)
     user.save()
     return make_response(jsonify(user.to_dict()), 200)
