@@ -84,9 +84,9 @@ def place_search():
 
     all_places = storage.all(Place)
     match = set()
-    states = data.get('states') if data else []
-    cities = data.get('cities') if data else []
-    amenities = data.get('amenities') if data else []
+    states = data.get('states') if data.get('states') else []
+    cities = data.get('cities') if data.get('cities') else []
+    amenities = data.get('amenities') if data.get('amenities') else []
     all_empty = not states and not cities and not amenities
     if all_empty:
         match = set(all_places.values())
@@ -106,5 +106,11 @@ def place_search():
                      for amenity_id in amenities}
         match = {place for place in match
                  if amenities.intersection(set(place.amenities)) == amenities}
-    match = [place.to_dict() for place in match]
-    return jsonify(match)
+
+    final_match = []
+    for place in match:
+        place_dict = place.to_dict()
+        place_dict.pop('amenities', None)
+        final_match.append(place_dict)
+
+    return jsonify(final_match)
