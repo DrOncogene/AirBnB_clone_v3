@@ -9,6 +9,7 @@ from datetime import datetime
 import inspect
 import pep8
 import models
+from models import review
 from models.engine import file_storage
 from models.amenity import Amenity
 from models.base_model import BaseModel
@@ -81,6 +82,8 @@ class TestFileStorage(unittest.TestCase):
             os.remove('file.json')
         except FileNotFoundError:
             pass
+        storage = FileStorage()
+        storage._FileStorage__objects.clear()
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_all_returns_dict(self):
@@ -122,3 +125,27 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self) -> None:
+        """tests the count method"""
+        storage = FileStorage()
+        new_objs = [User(), User(), City(), Place()]
+        for obj in new_objs:
+            obj.save()
+        self.assertEqual(storage.count(User), 2)
+        self.assertEqual(storage.count(City), 1)
+        self.assertEqual(storage.count(Place), 1)
+        self.assertEqual(storage.count(Amenity), 0)
+        self.assertEqual(storage.count(), 4)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self) -> None:
+        """tests the get method"""
+        storage = FileStorage()
+        user = User()
+        user.save()
+        place = Place()
+        place.save()
+        self.assertIs(user, storage.get(User, user.id))
+        self.assertIs(place, storage.get(Place, place.id))

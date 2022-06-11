@@ -99,4 +99,3 @@ def place_search():
     states = data['states']
     for state_id in states:
         pass
-    

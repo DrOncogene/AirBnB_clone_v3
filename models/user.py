@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 """ holds class User"""
+from hashlib import md5
 from os import getenv
+
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
-from hashlib import md5
+
 import models
-from models.base_model import BaseModel, Base
+from models.base_model import Base, BaseModel
 
 
 class User(BaseModel, Base):

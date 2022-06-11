@@ -2,19 +2,16 @@
 """
 Contains the class DBStorage
 """
-
-import models
+from os import getenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 from models.amenity import Amenity
-from models.base_model import BaseModel, Base
+from models.base_model import Base
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-from os import getenv
-import sqlalchemy
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 
 classes = {"Amenity": Amenity, "City": City,
            "Place": Place, "Review": Review, "State": State, "User": User}
@@ -23,6 +20,7 @@ classes = {"Amenity": Amenity, "City": City,
 class DBStorage:
     """interaacts with the MySQL database"""
     __engine = None
+    __sessionmaker = None
     __session = None
 
     def __init__(self):
@@ -57,7 +55,10 @@ class DBStorage:
 
     def save(self):
         """commit all changes of the current database session"""
-        self.__session.commit()
+        try:
+            self.__session.commit()
+        except Exception:
+            self.__session.rollback()
 
     def delete(self, obj=None):
         """delete from the current database session obj if not None"""
@@ -68,12 +69,13 @@ class DBStorage:
         """reloads data from the database"""
         Base.metadata.create_all(self.__engine)
         sess_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(sess_factory)
-        self.__session = Session
+        self.__sessionmaker = scoped_session(sess_factory)
+        self.__session = self.__sessionmaker()
 
     def close(self):
         """call remove() method on the private session attribute"""
-        self.__session.remove()
+        self.__session.close()
+        self.__session = self.__sessionmaker()
 
     def get(self, cls, id):
         """returns a single obj of cls with id"""

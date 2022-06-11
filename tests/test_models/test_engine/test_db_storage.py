@@ -2,22 +2,21 @@
 """
 Contains the TestDBStorageDocs and TestDBStorage classes
 """
-
-from datetime import datetime
+import json
+import os
+import pep8
+import unittest
 import inspect
 import models
+from models import amenity
 from models.engine import db_storage
 from models.amenity import Amenity
-from models.base_model import BaseModel
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-import json
-import os
-import pep8
-import unittest
+
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -68,21 +67,76 @@ test_db_storage.py'])
                             "{:s} method needs a docstring".format(func[0]))
 
 
-class TestFileStorage(unittest.TestCase):
+class TestDBStorage(unittest.TestCase):
     """Test the FileStorage class"""
-    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_all_returns_dict(self):
-        """Test that all returns a dictionaty"""
-        self.assertIs(type(models.storage.all()), dict)
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.storage = DBStorage()
+        cls.storage.reload()
+
+    def setUp(self) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        self.storage.close()
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
-    def test_all_no_class(self):
-        """Test that all returns all rows when no class is passed"""
+    def test_all_returns_dict(self):
+        """Test that all returns a dict"""
+        new_dict = self.storage.all()
+        self.assertEqual(type(new_dict), dict)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_new(self):
-        """test that new adds an object to the database"""
+        """test that new adds an object to the session"""
+        amenity1 = Amenity(name='Internet')
+        state1 = State(name='Abuja')
+        self.storage.new(amenity1)
+        self.storage.new(state1)
+        objs = [amenity1, state1]
+        for obj in objs:
+            self.assertIs(obj, self.storage.get(obj.__class__, obj.id))
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
-        """Test that save properly saves objects to file.json"""
+        """Test that save properly saves objects to to database"""
+        new_dict = {}
+        user = User(email='me@hbnb.com', password='pwd')
+        user.save()
+        amenity1 = Amenity(name='Internet')
+        amenity1.save()
+        objs = [user, amenity1]
+        for obj in objs:
+            key = obj.__class__.__name__ + "." + obj.id
+            new_dict[key] = obj
+        self.storage.close()
+        for obj in new_dict:
+            self.assertIn(obj, self.storage.all())
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self) -> None:
+        """tests the count method"""
+        new_objs = [User(password="pwd1", email="one@mail.com"),
+                    User(password='pwd2', email="two@mail.com"),
+                    Amenity(name="WiFi")]
+        for obj in new_objs:
+            self.storage.new(obj)
+        self.assertEqual(self.storage.count(User), 2)
+        self.assertEqual(self.storage.count(Amenity), 1)
+        self.assertEqual(self.storage.count(), 3)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self) -> None:
+        """tests the get method"""
+        user = User(password="pwd", email="one@mail.com")
+        user.save()
+        state = State(name='Kogi')
+        state.save()
+        city = City(state_id=state.id, name="Lokoja")
+        city.save()
+        self.assertEqual(user.password,
+                         self.storage.get(User, user.id).password)
+        self.assertEqual(city.state_id,
+                         self.storage.get(City, city.id).state_id)
+        self.assertEqual(state.name,
+                         self.storage.get(State, state.id).name)
